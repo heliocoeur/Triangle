@@ -1,0 +1,232 @@
+---
+
+1. Le triangle d'incompatibilite (O, L\_n, T\_n)
+
+On reprend les trois formules abstraites sur un domaine T, une propriete unaire P et une relation R a arite n :
+
+1. O = exists x. not P(x)
+2. L\_n = forall x1,...,xn. R(x1,...,xn) -> (P(x1) and P(x2) and ... and P(xn))
+3. T\_n = forall x1,...,xn. R(x1,...,xn)
+
+Observation essentielle (triangle d'incompatibilite) :
+O and L\_n and T\_n |- bot
+
+En effet, si T\_n est vrai, alors pour tout (x1,...,xn) on a R(x1,...,xn).
+En particulier, pour le tuple (a,...,a) ou a est un temoin de not P(a) (que fournit O), on aurait R(a,...,a) vrai, donc par L\_n on obtiendrait P(a) --- contradiction.
+
+---
+
+2. Les corollaires du triangle
+
+A partir de
+O and L\_n and T\_n |- bot,
+on tire trois corollaires constructifs (rabattre l'un des trois), chacun exhibant un temoin si necessaire :
+
+1. O and L\_n |- not T\_n
+
+   * Raisonnement constructif :
+
+     * O donne un element a tel que not P(a).
+     * Par contraposition de L\_n, on sait que not P(a) -> not R(a,...,a).
+     * Donc exists x1,...,xn. not R(x1,...,xn), c'est-a-dire not T\_n, en prenant pour temoin (a,...,a).
+
+2. O and T\_n |- not L\_n
+
+   * Raisonnement constructif :
+
+     * O donne un a tel que not P(a).
+     * T\_n garantit que R(a,...,a) est vrai.
+     * La forme negation de L\_n s'ecrit : exists x1,...,xn. (R(x1,...,xn) and (not P(x1) or ... or not P(xn))).
+     * On prend pour temoin (a,...,a). Alors R(a,...,a) est vrai (car T\_n) et (not P(a) or ... or not P(a)) est vrai (car not P(a)).
+     * Donc not L\_n.
+
+3. L\_n and T\_n |- not O
+
+   * Raisonnement constructif :
+
+     * Pour demontrer not O (soit forall y. P(y)), on prend un element arbitraire y du domaine T.
+     * Par T\_n, on a R(y,...,y).
+     * Par L\_n, R(y,...,y) -> (P(y) and ... and P(y)). En particulier, R(y,...,y) implique P(y).
+     * Ainsi pour tout y, P(y), ce qui est not O.
+
+Chaque corollaire est muni d'un temoin (quand il s'agit d'un exists), et montre comment "rabattre" l'une des trois hypotheses du triangle.
+
+---
+
+3. La "soustraction" et la formule Delta\_i
+
+Lorsque l'on utilise l'argument "O and T\_n => not L\_n" de maniere constructive, on instancie la negation de L\_n. Concretement :
+
+* Partant de O and T\_n, on sait qu'il existe un b tel que not P(b) (par O), et que R(b,...,b) (par T\_n).
+
+* Pour formaliser not L\_n, on ecrit la formule qu'on appellera Delta\_i :
+
+  Delta\_i : R(b,...,b) and (not P(b) or ... or not P(b)).
+
+  Mais comme tous les components sont b, on simplifie en :
+  Delta\_i : R(b,...,b) and not P(b).
+
+* Cette Delta\_i temoigne explicitement de la falsite de L\_n : c'est elle qui incarne not L\_n.
+
+En d'autres termes, Delta\_i est la formule concrete (au plus bas niveau) obtenue par "soustraction" d'un sommet (ici L\_n) du triangle, tout en gardant trace du temoin b.
+
+---
+
+4. De Delta\_i aux schemas "multiplication" et "division"
+
+La formule Delta\_i fait apparaitre a la fois :
+
+1. Le fait que R(b,...,b) est vrai,
+2. Le fait que not P(b) est vrai.
+
+Or, ces deux informations se reinterpretent comme les deux directions suivantes :
+
+1. Multiplication (schema "R -> P") :
+
+   * C'est la forme generale de L\_n :
+     forall x1,...,xn. R(x1,...,xn) -> (P(x1) and ... and P(xn)).
+   * En regle d'inference, on lit : "Si R(x1,...,xn) est vrai, alors on tire tous les P(xk)."
+   * C'est l'etincelle "multiplicationnelle" : on ramene la verite de la conjonction R a celle de chacun des P.
+
+2. Division (contraposition de L\_n) :
+
+   * A partir de R(x1,...,xn) -> (P(x1) and ... and P(xn)), on passe constructivement a :
+     not P(a) -> not R(a,...,a).
+   * C'est l'etincelle "divisionnelle" : "Si not P(a), alors not R(a,...,a)."
+
+Dans Delta\_i, on a precisement :
+
+* R(b,...,b) : un cas particulier de l'antecedent de L\_n.
+* not P(b) : l'echec de l'un des conjoints P(xk) quand tous les xk valent b.
+
+On peut donc extraire deux regles generiques (au niveau structurel le plus bas) :
+
+* Multiplication :
+  \[ R(x1,...,xn) ] -> \[ P(x1) and ... and P(xn) ]
+
+* Division :
+  \[ not P(a) ] -> \[ not R(a,...,a) ]
+
+Ces deux regles sont "extraites" au plus bas niveau par inspection de Delta\_i.
+
+---
+
+5. De la "multiplication / division" a l'etat actif du triangle
+
+Une fois ces deux schemas clairement poses (multiplication = L\_n, division = contraposition de L\_n), on revoit les trois manieres de maintenir exactement deux des formules {O, L\_n, T\_n} et d'en deduire constructivement la negation de la troiseme. Ce sont les etats actifs du triangle.
+
+5.1 Etat actif "O and L\_n and not T\_n" (branche 1)
+
+* Hypotheses :
+
+  1. O : exists a. not P(a).
+  2. L\_n : forall x1,...,xn. R(x1,...,xn) -> (P(x1) and ... and P(xn)).
+
+* On veut montrer : not T\_n = exists x1,...,xn. not R(x1,...,xn).
+
+  Demonstration :
+
+  1. Choisissons le temoin a donne par O (tel que not P(a)).
+  2. Pour demontrer not R(a,...,a), on utilise la division :
+     not P(a) -> not R(a,...,a). Puisque not P(a) est vrai, on deduit not R(a,...,a).
+  3. Donc exists x1,...,xn. not R(x1,...,xn), c'est-a-dire not T\_n.
+  4. C'est exactement not T\_n.
+
+* Conclusion :
+  O and L\_n |- not T\_n,
+  avec temoin explicite (a,...,a). Cet etat actif traduit la situation ou l'on conserve O et L\_n et ou l'on debouche sur la falsite de T\_n.
+
+---
+
+5.2 Etat actif "O and T\_n and not L\_n" (branche 2)
+
+* Hypotheses :
+
+  1. O : exists b. not P(b).
+  2. T\_n : forall x1,...,xn. R(x1,...,xn).
+
+* On veut montrer : not L\_n = exists x1,...,xn. (R(x1,...,xn) and (not P(x1) or ... or not P(xn))).
+
+  Demonstration :
+
+  1. Prenons le temoin b avec not P(b) (fourni par O).
+  2. Par T\_n, on sait que R(b,...,b) est vrai.
+  3. Donc, pour (b,...,b), on a a la fois
+
+     * R(b,...,b) vrai,
+     * (not P(b) or ... or not P(b)) vrai (car not P(b)).
+  4. Donc exists x1,...,xn. (R(x1,...,xn) and (not P(x1) or ... or not P(xn))).
+  5. Cela donne not L\_n, avec temoin (b,...,b).
+
+* Conclusion :
+  O and T\_n |- not L\_n,
+  etat actif ou l'on garde O et T\_n, et on rejette L\_n.
+
+---
+
+5.3 Etat actif "L\_n and T\_n and not O" (branche 3)
+
+* Hypotheses :
+
+  1. L\_n : forall x1,...,xn. R(x1,...,xn) -> (P(x1) and ... and P(xn)).
+  2. T\_n : forall x1,...,xn. R(x1,...,xn).
+
+* On veut montrer : not O = forall y. P(y).
+
+  Demonstration :
+
+  1. Prenons un element arbitraire y.
+  2. Par T\_n, on a R(y,...,y).
+  3. Par multiplication (L\_n), R(y,...,y) -> P(y), donc P(y).
+  4. Ainsi pour tout y, P(y), ce qui est not O.
+
+* Conclusion :
+  L\_n and T\_n |- not O,
+  etat actif ou l'on maintient L\_n et T\_n, et on rejette O.
+
+---
+
+6. Conclusion : de l'etat actif a l'additivite locale
+
+Par definition, l'additivite locale du triangle (O, L\_n, T\_n) signifie que pour chacune des paires {O, L\_n}, {O, T\_n}, {L\_n, T\_n}, on peut directement en deduire la negation de la troisieme proposition, en produisant un temoin explicite si necessaire. C'est exactement ce que montrent chacun des trois etats actifs ci-dessus :
+
+1. {O, L\_n} => not T\_n    -> Etat actif "O and L\_n and not T\_n".
+2. {O, T\_n} => not L\_n    -> Etat actif "O and T\_n and not L\_n".
+3. {L\_n, T\_n} => not O    -> Etat actif "L\_n and T\_n and not O".
+
+Chacune de ces implications repose au plus bas niveau sur :
+
+* Le schema multiplication : R(x1,...,xn) -> (P(x1) and ... and P(xn)).
+* Le schema division (contraposition) : not P(a) -> not R(a,...,a).
+* L'existence d'un temoin a (not P(a)) (fourni par O).
+* L'omnipresence (ou non) de R(b,...,b) (fourni par T\_n).
+
+Des qu'on "active" deux des trois sommets (O, L\_n, T\_n), on peut fabriquer la faussete de la troisieme. C'est pourquoi l'existence d'un etat actif garantit l'additivite locale : chaque paire vraie du triangle entraine constructivement la negation de la troisieme.
+
+---
+
+En resume dynamique :
+
+1. Triangle initial : O, L\_n, T\_n (incompatibles).
+
+2. Corollaires :
+
+   * O and L\_n |- not T\_n
+   * O and T\_n |- not L\_n
+   * L\_n and T\_n |- not O
+
+3. Soustraction (Delta\_i) :
+
+   * Prenez O and T\_n. Le temoin b de not P(b) et la verite de R(b,...,b) donnent
+     Delta\_i : R(b,...,b) and not P(b), qui incarne not L\_n.
+
+4. Extraction des schemas "multiplication / division" :
+
+   * Multiplication : R(x1,...,xn) -> (P(x1) and ... and P(xn)).
+   * Division : not P(a) -> not R(a,...,a).
+
+5. Etat actif & additivite :
+
+   * Les trois etats actifs montrent que toute paire de formules vraies implique la negation de la troisieme.
+
+Ainsi, on a respecte le niveau le plus bas (Delta\_i) et montre dynamiquement comment chaque etape conduit a la suivante, jusqu'a l'etat actif final qui assure l'additivite locale.
